@@ -147,6 +147,14 @@ class AccountSpecificTests(unittest.TestCase):
         self.assertEqual(len(rewards), calendar.monthrange(now.year,  now.month)[1])
     def test_claimed_rewards(self):
         next(gs.get_claimed_rewards())
+    def test_set_visibility(self):
+        gs.set_visibility(False)
+        gs.set_cookies()
+        cookie = gs.get_browser_cookies()
+        with self.assertRaises(gs.DataNotPublic):
+            gs.get_user_stats(uid, cookie=dict(ltuid=119480035, ltoken="cnF7TiZqHAAvYqgCBoSPx5EjwezOh1ZHoqSHf7dT"))
+        gs.set_cookie(cookie)
+        gs.set_visibility(True)
 
 if __name__ == '__main__':
     unittest.main()

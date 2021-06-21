@@ -161,17 +161,18 @@ def fetch_endpoint(endpoint: str, chinese: bool = False, cookie: Mapping[str, An
     else:
         raise TooManyRequests("All cookies have hit their request limit of 30 accounts per day.")
 
-def get_user_stats(uid: int) -> dict:
+def get_user_stats(uid: int, cookie: Mapping[str, Any] = None) -> dict:
     """Gets basic user information and stats."""
     server = recognize_server(uid)
     data = fetch_endpoint(
         "game_record/genshin/api/index",
         chinese=is_chinese(uid),
+        cookie=cookie,
         params=dict(server=server, role_id=uid)
     )
     return prettify_user_stats(data)
 
-def get_characters(uid: int, character_ids: List[int] = None, lang: str = 'en-us') -> list:
+def get_characters(uid: int, character_ids: List[int] = None, lang: str = 'en-us', cookie: Mapping[str, Any] = None) -> list:
     """Gets characters of a user.
     
     Characters contain info about their level, constellation, weapon, and artifacts.
@@ -186,13 +187,14 @@ def get_characters(uid: int, character_ids: List[int] = None, lang: str = 'en-us
     data = fetch_endpoint(
         "game_record/genshin/api/character",
         chinese=is_chinese(uid),
+        cookie=cookie,
         method='POST',
         json=dict(character_ids=character_ids, role_id=uid, server=server),  # POST uses the body instead
         headers={'x-rpc-language': lang},
     )["avatars"]
     return prettify_characters(data)
 
-def get_spiral_abyss(uid: int, previous: bool = False) -> dict:
+def get_spiral_abyss(uid: int, previous: bool = False, cookie: Mapping[str, Any] = None) -> dict:
     """Gets spiral abyss runs of a user and details about them.
     
     Every season these stats refresh and you can get the previous stats with `previous`.
@@ -202,17 +204,18 @@ def get_spiral_abyss(uid: int, previous: bool = False) -> dict:
     data = fetch_endpoint(
         "game_record/genshin/api/spiralAbyss",
         chinese=is_chinese(uid),
+        cookie=cookie,
         params=dict(server=server, role_id=uid, schedule_type=schedule_type)
     )
     return prettify_spiral_abyss(data)
 
-def get_all_user_data(uid: int, lang: str = 'en-us') -> dict:
+def get_all_user_data(uid: int, lang: str = 'en-us', cookie: Mapping[str, Any] = None) -> dict:
     """Fetches all data a user can has. Very slow.
     
     A helper function that gets all avalible data for a user and returns it as one dict.
     However that makes it fairly slow so it's not recommended to use it outside caching.
     """
-    data = get_user_stats(uid)
-    data['characters'] = get_characters(uid, [i['id'] for i in data['characters']], lang=lang)
-    data['spiral_abyss'] = [get_spiral_abyss(uid), get_spiral_abyss(uid, previous=True)]
+    data = get_user_stats(uid, cookie)
+    data['characters'] = get_characters(uid, [i['id'] for i in data['characters']], lang, cookie)
+    data['spiral_abyss'] = [get_spiral_abyss(uid, previous, cookie) for previous in [False, True]]
     return data

@@ -294,7 +294,7 @@ The authkey is a temporary token to access your wish history. It's unique for ev
 When making projects that claim daily rewards for other users you can pass in a `cookie` parameter - `claim_daily_rewards(cookie={'ltuid': ..., 'ltoken': ...})`.
 This will avoid having to set global cookies so you can use it with threading.
 
-Hint: If you want to use your user's cookies to fetch data you can add it with `set_cookies(cookie, clear=False)`.
+This cookie parameter is avalible for the majority of other accounts.
 
 ## Is it possible that my account can be stolen when I login with the cookie?
 I would like to be completely clear in this aspect, I do no have any way to access the cookies you use to login. If you give your cookie to someone it is indeed possible to get into your account but that doesn't yet mean they can do anything with it. The most probable thing a hacker would do is just do a password request, but since version `1.3` they will need to confirm this request with an email. That means they would need to know what your email is and have a way to get into it, which I doubt they can. Since version `1.5` there is also 2FA which will make it completely impossible to steal your account.
@@ -323,8 +323,10 @@ All the data you can get should be already implemented. If you see an endpoint t
 `set_cookie_auto()` searches your browsers for possible cookies used to login into your genshin accounts and then uses those, so there's no need to use `set_cookies()`.
 When getting said cookies, they are filtered so only ones for mihoyo are ever pulled out. They will only ever be used as authentication and will never be sent anywhere else.
 
-## What's the rate limit?
-As far as I know there is no rate limit, however I recommend you avoid spamming the api, as mihoyo can still ip ban you. My guess is that if you try to make more than 1 request per second the chances are mihoyo is not going to appreciate it.
+## What's the ratelimit?
+You may only fetch data for 30 users per day per cookie.
+That means that when making projects that fetches data for other users it's recommended to use multiple cookies.
+You can set a bunch of cookies at once with `set_cookies(cookie1, cookie2, ...)`.
 
 ## How can I get an in-game uid from a hoyolab uid?
 `get_uid_from_hoyolab(hoyolab_uid)` can do that for you. It will return None if the user's data is private. To check whether a given uid is a game or a hoyolab one use `is_game_uid(uid)`.
