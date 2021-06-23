@@ -140,12 +140,9 @@ gs.set_authkey("https://webstatic-sea.mihoyo.com/ys/event/im-service/index.html?
 gs.set_authkey('other_output_log.txt')
 ```
 > Since the authkey lasts only a day this is more like for exporting than for actual use.
-### signin
+### daily rewards
 Automatically get daily sign in rewards for the currently logged-in user.
 ```py
-signed_in, claimed_rewards = gs.get_daily_reward_info()
-print('total rewards claimed:', claimed_rewards)
-
 reward = gs.claim_daily_reward()
 if reward is not None:
     print(f"Claimed daily reward - {reward['cnt']}x {reward['name']}")

@@ -76,7 +76,7 @@ def set_cookies(*args: Union[Mapping[str, Any], str], clear: bool = True) -> Non
 def get_browser_cookies(browser: str = None) -> Dict[str, str]:
     """Gets cookies from your browser for later storing.
     
-    If a specifc browser is set, gets data from that browser only.
+    If a specific browser is set, gets data from that browser only.
     Avalible browsers: chrome, chromium, opera, edge, firefox
     """
     import browser_cookie3  # optional library
@@ -98,7 +98,7 @@ def set_cookie_auto(browser: str = None) -> None:
     Be aware that this process can take up to 10 seconds.
     To speed it up you may select a browser.
     
-    If a specifc browser is set, gets data from that browser only.
+    If a specific browser is set, gets data from that browser only.
     Avalible browsers: chrome, chromium, opera, edge, firefox
     """
     set_cookies(get_browser_cookies(browser), clear=True)

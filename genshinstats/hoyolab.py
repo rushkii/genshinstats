@@ -116,11 +116,12 @@ def redeem_code(code: str, uid: int = None, cookie: Mapping[str, Any] = None) ->
                         cdkey=code, game_biz='hk4e_global', lang='en')
         )
     else:
-        for account in get_game_accounts():
-            if account['level'] < 10:
-                continue # Cannot claim codes for account with adventure rank lower than 10.
-            redeem_code(code, account['game_uid'])
-            time.sleep(5) # there's a ratelimit of 1 request every 5 seconds
+        # cannot claim codes for accounts with ar lower than 10
+        accounts = [account for account in get_game_accounts(cookie=cookie) 
+                    if account['level'] >= 10]
+        for i, account in enumerate(accounts):
+            if i: time.sleep(5) # there's a ratelimit of 1 request every 5 seconds
+            redeem_code(code, account['game_uid'], cookie)
 
 def get_recommended_users(page_size: int = None) -> List[dict]:
     """Gets a list of recommended active users"""

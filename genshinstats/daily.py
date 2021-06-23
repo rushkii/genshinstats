@@ -2,7 +2,6 @@
 
 Automatically claims the next daily reward in the daily check-in rewards.
 """
-from functools import lru_cache
 from typing import Any, Dict, Iterator, Mapping, Optional, Tuple
 from urllib.parse import urljoin
 
@@ -37,14 +36,18 @@ def get_daily_reward_info(chinese: bool = False, cookie: Mapping[str, Any] = Non
     data = fetch_daily_endpoint("info", chinese, cookie=cookie)
     return data['is_sign'], data['total_sign_day']
 
-@lru_cache()
+_monthly_rewards = None # homebrew cache, dangerous since it should only last 1 month but who cares
 def get_monthly_rewards(chinese: bool = False, lang: str = 'en-us', cookie: Mapping[str, Any] = None) -> list:
     """Gets a list of avalible rewards for the current month"""
-    return fetch_daily_endpoint(
-        "home", chinese,
-        cookie=cookie,
-        params=dict(lang=lang)
-    )['awards']
+    global _monthly_rewards
+    if _monthly_rewards is None:
+        _monthly_rewards = fetch_daily_endpoint(
+            "home", chinese,
+            cookie=cookie,
+            params=dict(lang=lang)
+        )['awards']
+    
+    return _monthly_rewards
 
 def get_claimed_rewards(chinese: bool = False, cookie: Mapping[str, Any] = None) -> Iterator[dict]:
     """Gets all claimed awards for the currently logged-in user"""
@@ -72,14 +75,15 @@ def claim_daily_reward(uid: int = None, chinese: bool=False, lang: str = 'en-us'
     """
     signed_in, claimed_rewards = get_daily_reward_info(chinese, cookie)
     if signed_in:
-        return None # already signed in
+        return None
     
-    uid = uid or get_game_accounts(chinese, cookie)[0]['game_uid'] # we need just one uid
+    # we need just one uid
+    uid = uid or get_game_accounts(chinese, cookie)[0]['game_uid']
     fetch_daily_endpoint(
         "sign", chinese,
         cookie=cookie,
         method="POST",
-        params=dict(uid=uid, region=recognize_server(uid))
+        params=dict(uid=uid, region=recognize_server(uid), lang=lang)
     )
     rewards = get_monthly_rewards(chinese, lang, cookie)
     return rewards[claimed_rewards]
