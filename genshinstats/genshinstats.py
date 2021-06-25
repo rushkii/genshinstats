@@ -17,7 +17,7 @@ from .pretty import *
 from .utils import USER_AGENT, is_chinese, recognize_server
 
 __all__ = [
-    'set_cookie', 'set_cookies', 'get_browser_cookies', 'set_cookies_auto', 'set_cookie_auto', 'get_ds_token', 
+    'set_cookie', 'set_cookies', 'get_browser_cookies', 'set_cookies_auto', 'set_cookie_auto',
     'fetch_endpoint', 'get_user_stats', 'get_characters', 'get_spiral_abyss', 'get_all_user_data'
 ]
 
@@ -105,7 +105,7 @@ def set_cookie_auto(browser: str = None) -> None:
 set_cookies_auto = set_cookie_auto # alias
 
 
-def get_ds_token(salt: str = DS_SALT) -> str:
+def generate_ds_token(salt: str = DS_SALT) -> str:
     """Creates a new ds token for authentication."""
     t = int(time.time())  # current seconds
     r = ''.join(random.choices(string.ascii_letters, k=6))  # 6 random chars
@@ -116,6 +116,8 @@ def _request(*args, **kwargs):
     """Fancy requests.request"""
     r = session.request(*args, **kwargs)
     r.raise_for_status()
+    kwargs['cookies'].update(session.cookies)
+    session.cookies.clear()
     data = r.json()
     if data['retcode'] == 0:
         return data['data']
@@ -133,9 +135,8 @@ def fetch_endpoint(endpoint: str, chinese: bool = False, cookie: Mapping[str, An
     
     Supports handling ratelimits if multiple cookies are set with `set_cookies`
     """
-    
     # parse the arguments for requests.request
-    session.headers['ds'] = get_ds_token()
+    session.headers['ds'] = generate_ds_token()
     method = kwargs.pop('method', 'get')
     url = urljoin(CN_TAKUMI_URL if chinese else OS_BBS_URL, endpoint)
     
@@ -151,9 +152,6 @@ def fetch_endpoint(endpoint: str, chinese: bool = False, cookie: Mapping[str, An
         except TooManyRequests:
             # move the ratelimited cookie to the end to let the ratelimit wear off
             cookies.append(cookies.pop(0))
-        finally:
-            cookie.update(session.cookies)
-            session.cookies.clear()
     
     # if we're here it means we used up all our cookies so we must handle that
     if len(cookies) == 1:

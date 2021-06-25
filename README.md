@@ -13,7 +13,12 @@ using [pip](https://pypi.org/project/genshinstats/)
 ```
 pip install genshinstats
 ```
-or clone and install manually
+### Alternatives:
+using pip from the dev branch
+```py
+pip install git+https://github.com/thesadru/genshinstats@dev
+```
+clone and install manually
 ```
 git clone https://github.com/thesadru/genshinstats.git
 cd genshinstats
@@ -26,18 +31,18 @@ Since all mihoyo's apis are private there's no kind of api token or authenticati
 
 The best way to learn is with examples so I have provided a usage example for every function.
 
-[API documentation](https://thesadru.github.io/pdoc/genshinstats/)
+You may also use the [documentation](https://thesadru.github.io/pdoc/genshinstats/)
 
 # examples
 Simple examples of usage:
 ```py
-import genshinstats as gs # import module
-gs.set_cookie(ltuid=119480035, ltoken="cnF7TiZqHAAvYqgCBoSPx5EjwezOh1ZHoqSHf7dT") # login
+import genshinstats as gs
+gs.set_cookie(ltuid=119480035, ltoken="cnF7TiZqHAAvYqgCBoSPx5EjwezOh1ZHoqSHf7dT")
 
 uid = 710785423
-data = gs.get_user_stats(uid) # get user info with a uid
-total_characters = len(data['characters']) # get the amount of characters
-print('user "sadru" has a total of',total_characters,'characters')
+data = gs.get_user_stats(uid)
+total_characters = len(data['characters'])
+print('user "sadru" has a total of', total_characters, 'characters')
 ```
 > Cookies should be your own. These are just some example cookies of an account that can be deleted at any time.
 
@@ -140,6 +145,8 @@ gs.set_authkey("https://webstatic-sea.mihoyo.com/ys/event/im-service/index.html?
 gs.set_authkey('other_output_log.txt')
 ```
 > Since the authkey lasts only a day this is more like for exporting than for actual use.
+> 
+> For more info on how to get the authkey you can use the instructions on [paimon.moe](https://paimon.moe/wish), just click the "auto import" button.
 ### daily rewards
 Automatically get daily sign in rewards for the currently logged-in user.
 ```py
@@ -225,7 +232,6 @@ print(characters)
 
 ## using genshinstats asynchronously (for example with a discord bot)
 To use any function asynchronously you can use the `asyncify()` function.
-It takes the a function and its args and kwargs. Returns an awaitable.
 ```py
 import asyncio
 import genshinstats as gs

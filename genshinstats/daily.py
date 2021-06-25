@@ -83,6 +83,7 @@ def claim_daily_reward(uid: int = None, chinese: bool=False, lang: str = 'en-us'
         "sign", chinese,
         cookie=cookie,
         method="POST",
+        # these seem to no longer be required however I'm not risking it
         params=dict(uid=uid, region=recognize_server(uid), lang=lang)
     )
     rewards = get_monthly_rewards(chinese, lang, cookie)
